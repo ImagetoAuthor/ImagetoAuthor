@@ -6,6 +6,7 @@ from PIL import Image
 from torchvision import transforms
 import numpy as np
 import argparse
+import heapq
 
 
 def get_setting(path):
@@ -23,10 +24,17 @@ def load_pretrained_model(path, model, mode='best'):
     print('best_epoch:{}, best_acc:{}'.format(state['epoch'], state['acc']))
     model.load_state_dict(state['net'])
 
-//flag为false为用户自画图 flag为true为名家图片识别
+def topThree(array):
+    dict = {}
+    for i in range(3):
+        a = np.argmax(array)
+        dict[a] = array[a]
+        array[a] = 0
+    return dict
+
+# flag为false为用户自画图 flag为true为名家图片识别
 def ImagetoAuthor(img_path, flag = False):
     mode = 'best'
-    
     parser = argparse.ArgumentParser()
     parser.add_argument('--savepath', default='./eff-b3', type=str)
     parser.add_argument('--last', action='store_true')
@@ -71,4 +79,4 @@ def ImagetoAuthor(img_path, flag = False):
             pred = np.argmax(results)
             return pred
         else:
-            return results
+            return topThree(results)
